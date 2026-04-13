@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
+    id("com.diffplug.spotless") version "8.4.0"
 }
 
 group = "dev.priyanshu"
@@ -28,4 +29,25 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+spotless {
+    java {
+        // Use the default importOrder configuration
+        importOrder()
+
+        removeUnusedImports()
+        forbidWildcardImports() // or expandWildcardImports, see below
+        forbidModuleImports()
+
+        // Cleanthat will refactor your code, but it may break your style: apply it before your formatter
+        cleanthat()          // has its own section below
+
+        // Choose one of these formatters.
+        googleJavaFormat()   // has its own section below
+
+        tableTestFormatter() // has its own section below
+
+        formatAnnotations()  // fixes formatting of type annotations, see below
+    }
 }
