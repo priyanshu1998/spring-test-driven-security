@@ -10,26 +10,29 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @TestConfiguration
 public class UserDetailsManagerConfiguration {
 
-    @Bean
-    public UserDetailsService users() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("ATTENDEE")
-                .build();
+  @Bean
+  public UserDetailsService users() {
+    UserDetails user =
+        User.withDefaultPasswordEncoder()
+            .username("user")
+            .password("password")
+            .roles("ATTENDEE")
+            .build();
 
-        UserDetails speaker = User.withDefaultPasswordEncoder()
-                .username("speaker")
-                .password("password")
-                .roles("SPEAKER")
-                .build();
+    UserDetails speaker =
+        User.withDefaultPasswordEncoder()
+            .username("speaker")
+            .password("password")
+            .roles("SPEAKER")
+            .build();
 
-        UserDetails admin = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("password")
-                .roles("ADMIN")
-                .build();
+    UserDetails admin =
+        User.withDefaultPasswordEncoder()
+            .username("admin")
+            .password("password")
+            .roles("ADMIN")
+            .build();
 
-        return new InMemoryUserDetailsManager(user, speaker, admin);
-    }
+    return new InMemoryUserDetailsManager(user, speaker, admin);
+  }
 }
