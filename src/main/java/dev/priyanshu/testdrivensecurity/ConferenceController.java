@@ -25,4 +25,9 @@ public class ConferenceController {
   public String greeting(@AuthenticationPrincipal(expression = "username") String username) {
     return "Hello, " + username + "!";
   }
+
+  @GetMapping("/support")
+  public String console() {
+    return "This page should be accessible by support folk only";
+  }
 }

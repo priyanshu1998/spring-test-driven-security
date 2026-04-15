@@ -1,6 +1,9 @@
 package dev.priyanshu.testdrivensecurity;
 
+import static org.springframework.security.oauth2.jwt.JoseHeaderNames.ALG;
+import static org.springframework.security.oauth2.jwt.JwtClaimNames.SUB;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
@@ -12,14 +15,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @Import(UserDetailsManagerConfiguration.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@MockitoBean(types = JwtDecoder.class)
 class TestDrivenSecurityApplicationTests {
 
   @Autowired WebApplicationContext context;
@@ -102,5 +109,26 @@ class TestDrivenSecurityApplicationTests {
   @Test
   public void postAboutWithoutCsrfThenReturns403() {
     Assertions.assertThat(this.mockMvcTester.post().uri("/about")).hasStatus(HttpStatus.FORBIDDEN);
+  }
+
+  @Test
+  void jwtTest200WhenScopeSupportIsPresent() {
+    Jwt supportJwt =
+        Jwt.withTokenValue("token")
+            .header(ALG, "none")
+            .claim(SUB, "customer-support")
+            .claim("scope", "support")
+            .build();
+
+    Assertions.assertThat(
+            this.mockMvcTester.get().uri("/support").with(jwt().jwt(supportJwt)).with(csrf()))
+        .hasStatus(HttpStatus.OK);
+  }
+
+  @Test
+  void jwtTest401WhenScopeSupportIsMissing() {
+
+    Assertions.assertThat(this.mockMvcTester.get().uri("/support").with(csrf()))
+        .hasStatus(HttpStatus.UNAUTHORIZED);
   }
 }
